@@ -14,7 +14,8 @@ namespace WebServer.Models
         /// <summary>
         /// List of recipients (often will just have one entry)
         /// </summary>
-        public List<string> RecipientPhoneNumbers { get; set; }
+        public List<string> Recipients { get; set; }
+        
         
     }
 }

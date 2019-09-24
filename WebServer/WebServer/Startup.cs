@@ -1,20 +1,16 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Sockets;
-using System.Threading.Tasks;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.PlatformAbstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using WebServer.Controllers;
+using WebServer.Models;
 
 namespace WebServer
 {
@@ -23,7 +19,7 @@ namespace WebServer
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-
+            ClientController.FirebaseFunctionURL = configuration["FirebaseLink"];
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {
@@ -39,6 +35,14 @@ namespace WebServer
         
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            var builder = new ConfigurationBuilder().SetBasePath(ApplicationEnvironment.ApplicationBasePath)
+                .AddJsonFile("appsettings.json");
+
+            //services.AddSingleton<IConfiguration>(builder.Build());
+            services.AddSingleton<ITokens, Tokens>();
+            
+             
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

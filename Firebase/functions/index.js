@@ -127,5 +127,5 @@ exports.sendNewSMSMessageResult = functions.https.onRequest((req, res) => {
 		}
 	}
 
-}
+});
 

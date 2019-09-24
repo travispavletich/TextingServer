@@ -14,16 +14,22 @@ namespace WebServer.Controllers
         // Establish the token for the android client
         [HttpGet]
         [Route("Android/token")]
-        public ActionResult<string> Token(string token, [FromServices] ITokens tokens, [FromServices] IConfiguration config)
+        public ActionResult<RequestResult> Token(string token, [FromServices] ITokens tokens, [FromServices] IConfiguration config)
         {
+            var result = new RequestResult();
+            
             if (!string.IsNullOrEmpty(token))
             {
                 tokens.AndroidToken = token;
-                return Ok("Token Received");
+                result.Status = ResultStatus.Success;
+                result.ResultMessage = "Token Received Successfully";
+                return Ok(result);
             }
             else
             {
-                return BadRequest("Failure. Null or Empty token string");
+                result.Status = ResultStatus.Failure;
+                result.ErrorMessage = "Failure. Null or Empty token string";
+                return BadRequest(result);
             }
         }
 
@@ -35,8 +41,11 @@ namespace WebServer.Controllers
         
         [HttpPost]
         [Route("Android/BulkMessages")]
-        public ActionResult<string> BulkMessages([FromServices] ITokens tokens, [FromServices] IConfiguration config, List<Message> messages)
+        public ActionResult<RequestResult> BulkMessages([FromServices] ITokens tokens, [FromServices] IConfiguration config, List<Message> messages)
         {
+            var result = new RequestResult();
+            
+            
             const string firebaseFunc = "bulkMessages";
             var client = new RestClient(config["FirebaseLink"]);
             var clientToken = tokens.ClientToken;
@@ -50,8 +59,19 @@ namespace WebServer.Controllers
             req.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(dict), ParameterType.RequestBody);
 
             var response = client.Execute(req);
-            
-            return Ok();
+
+            if (response.ResponseStatus == ResponseStatus.Completed)
+            {
+                result.ResultMessage = "Successfully sent Bulk Messages to firebase";
+                result.Status = ResultStatus.Success;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
         }
 
         /******************************************************************
@@ -63,10 +83,11 @@ namespace WebServer.Controllers
         // Probably change the type of the status
         [HttpGet]
         [Route("Android/SendNewSMSMessageResult")]
-        public ActionResult<ResultStatus> SendNewSMSMessageResult([FromServices] ITokens tokens,
+        public ActionResult<RequestResult> SendNewSMSMessageResult([FromServices] ITokens tokens,
             [FromServices] IConfiguration config, string status)
         {
-            
+            var result = new RequestResult();
+
             const string firebaseFuncName = "askForBulkMessages";
             var client = new RestClient(config["FirebaseLink"]);
             var androidToken = tokens.AndroidToken;
@@ -74,8 +95,18 @@ namespace WebServer.Controllers
 
             var response = client.Execute(req);
 
-            return Ok(ResultStatus.Success);
-            // Probably check the response and return a result status based on that
+            if (response.ResponseStatus == ResponseStatus.Completed)
+            {
+                result.ResultMessage = "Successfully sent SMS Message result to firebase";
+                result.Status = ResultStatus.Success;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
         }
     }
 }

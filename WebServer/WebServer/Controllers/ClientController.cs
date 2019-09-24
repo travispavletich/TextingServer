@@ -18,16 +18,22 @@ namespace WebServer.Controllers
         
         [HttpGet]
         [Route("Client/Token")]
-        public ActionResult<string> Token([FromServices]ITokens tokens, string token)
+        public ActionResult<RequestResult> Token([FromServices]ITokens tokens, string token)
         {
+            var result = new RequestResult();
+            
             if (!string.IsNullOrEmpty(token))
             {
                 tokens.ClientToken = token;
-                return Ok("Token Received");
+                result.Status = ResultStatus.Success;
+                result.ResultMessage = "Token Received Successfully";
+                return Ok(result);
             }
             else
             {
-                return BadRequest("Failure. Null or Empty token string");
+                result.Status = ResultStatus.Failure;
+                result.ErrorMessage = "Failure. Null or Empty token string";
+                return BadRequest(result);
             }
         }
         
@@ -39,8 +45,10 @@ namespace WebServer.Controllers
         
         [HttpPost]
         [Route("Client/SendMessage")]
-        public ActionResult<ResultStatus> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, MessageSendRequest request)
+        public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, MessageSendRequest request)
         {
+            var result = new RequestResult();
+            
             const string firebaseFuncName = "textMessage";
             var client = new RestClient(config["FirebaseLink"]);
             var androidToken = tokens.AndroidToken;
@@ -56,8 +64,20 @@ namespace WebServer.Controllers
             req.RequestFormat = DataFormat.Json;
 
             var response = client.Execute(req);
-                    
-            return Ok(ResultStatus.Success);
+            
+             
+            if (response.ResponseStatus == ResponseStatus.Completed)
+            {
+                result.ResultMessage = "Successfully sent SendMessage request to firebase";
+                result.Status = ResultStatus.Success;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
         }
 
         /******************************************************************
@@ -68,9 +88,11 @@ namespace WebServer.Controllers
         
         [HttpGet]
         [Route("Client/RequestBulkMessages")]
-        public ActionResult<ResultStatus> RequestBulkMessages([FromServices] ITokens tokens,
+        public ActionResult<RequestResult> RequestBulkMessages([FromServices] ITokens tokens,
             [FromServices] IConfiguration config)
         {
+            var result = new RequestResult();
+            
             const string firebaseFuncName = "askForBulkMessages";
             var client = new RestClient(config["FirebaseLink"]);
             var androidToken = tokens.AndroidToken;
@@ -78,10 +100,18 @@ namespace WebServer.Controllers
 
             var response = client.Execute(req);
             
-            // Probably check the response and return a result status based on that
-            
-            return Ok(ResultStatus.Success);
+            if (response.ResponseStatus == ResponseStatus.Completed)
+            {
+                result.ResultMessage = "Successfully sent bulkMessageRequest to firebase";
+                result.Status = ResultStatus.Success;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
         }
-                
     }
 }

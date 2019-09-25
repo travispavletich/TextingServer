@@ -19,7 +19,6 @@ namespace WebServer
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            ClientController.FirebaseFunctionURL = configuration["FirebaseLink"];
             var host = Dns.GetHostEntry(Dns.GetHostName());
             foreach (var ip in host.AddressList)
             {

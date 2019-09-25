@@ -7,5 +7,6 @@ namespace WebServer.Models
         public string MessageText { get; set; }
         public string Recipient { get; set; }
         public DateTime TimeStamp { get; set; }
+
     }
 }

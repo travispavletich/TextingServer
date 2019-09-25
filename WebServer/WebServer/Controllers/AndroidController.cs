@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using RestSharp;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using WebServer.Models;
 
 namespace WebServer.Controllers
@@ -41,10 +42,9 @@ namespace WebServer.Controllers
         
         [HttpPost]
         [Route("Android/BulkMessages")]
-        public ActionResult<RequestResult> BulkMessages([FromServices] ITokens tokens, [FromServices] IConfiguration config, List<Message> messages)
+        public ActionResult<RequestResult> BulkMessages([FromServices] ITokens tokens, [FromServices] IConfiguration config, [FromBody] MessageList messageList)
         {
             var result = new RequestResult();
-            
             
             const string firebaseFunc = "bulkMessages";
             var client = new RestClient(config["FirebaseLink"]);
@@ -54,7 +54,7 @@ namespace WebServer.Controllers
             var dict = new Dictionary<string, object>()
             {
                 {"Token", clientToken},
-                {"Message", messages}
+                {"Messages", JsonConvert.SerializeObject(messageList)}
             };
             req.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(dict), ParameterType.RequestBody);
 
@@ -71,7 +71,7 @@ namespace WebServer.Controllers
                 result.ErrorMessage = response.ErrorMessage;
                 result.Status = ResultStatus.Failure;
                 return BadRequest(result);
-            }
+            } 
         }
 
         /******************************************************************

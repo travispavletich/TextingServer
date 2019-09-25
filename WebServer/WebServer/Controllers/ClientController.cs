@@ -49,7 +49,7 @@ namespace WebServer.Controllers
         {
             var result = new RequestResult();
             
-            const string firebaseFuncName = "textMessage";
+            const string firebaseFuncName = "sendNewSMSMessage";
             var client = new RestClient(config["FirebaseLink"]);
             var androidToken = tokens.AndroidToken;
             var req = new RestRequest(firebaseFuncName, Method.POST);
@@ -57,7 +57,7 @@ namespace WebServer.Controllers
             {
                 {"Token", androidToken},
                 {"Message", request.Message},
-                {"Recipients", request.Recipients}
+                {"Recipients", JsonConvert.SerializeObject(request.Recipients)}
             };
             
             req.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(dict), ParameterType.RequestBody);

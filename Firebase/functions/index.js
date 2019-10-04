@@ -7,7 +7,7 @@ admin.initializeApp(functions.config().firebase);
 /****************************************************************
  *																*
  *																*
- *		Functions which are called on behalf of the client		*
+ *			Functions which send messages to Android			*
  *																*
  *																*
  ***************************************************************/
@@ -19,25 +19,32 @@ admin.initializeApp(functions.config().firebase);
 	 *																*
 	 ***************************************************************/
 
-exports.sendNewSMSMessage = functions.https.onRequest((req, res) => {
-	let token = req.body.Token;
-	let message = req.body.Message;
-	let recipients = req.body.Recipients;
+// Tell the android app to send a message
+exports.SendMessage = functions.https.onRequest((req, res) => {
+	try{
+		let token = req.body.Token;
+		let message = req.body.Message;
+		let recipients = req.body.Recipients;
+		let messageID = req.body.MessageID;
 
-	console.log("token: " + token + "\tmessage: " + message + "\trecipients: " + recipients);
+		console.log("token: " + token + "\tmessage: " + message + "\trecipients: " + recipients);
 
-	let payload = {
-		data: {
-			message: message,
-			recipients: recipients
-		}
-	};
-	
-	admin.messaging().sendToDevice(token, payload);
-	res.send("Success"); 
+		let payload = {
+			data: {
+				NotificationType: "SendMessage",
+				Message: message,
+				Recipients: recipients,
+				MessageID: messageID
+			}
+		};
+		
+		admin.messaging().sendToDevice(token, payload);
+		res.send("Success"); 
+	}
+	catch (error){
+		res.status(400).send("Failure");
+	}
 });
-
-
 
 	/****************************************************************
 	 *																*
@@ -45,25 +52,51 @@ exports.sendNewSMSMessage = functions.https.onRequest((req, res) => {
 	 *																*
 	 ***************************************************************/
 
-exports.askForBulkMessages = functions.https.onRequest((req, res) => {
-	let token = req.body.Token;
-	
-	let payload = {
-		notification: {
-			title: "RequestForBulkMessages"
+// Tell the android app to get the conversation list and send it to the server
+exports.RetrieveConversations = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
+
+		let payload = {
+			data: {
+				NotificationType: "RetrieveConversations"
+			}
 		}
+
+		admin.messaging().sendToDevice(token, payload);
+
+		res.send("Success");
+	}
+	catch (error) {
+		res.status(400).send("Failure");
 	}
 
-	admin.messaging().sendToDevice(token, payload);
-	res.send("Success"); 
 });
 
+// Tell the android app to get the messages list and send it to the server
+exports.RetrieveMessageList = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
+
+		let payload = {
+			data: {
+				NotificationType: "RetrieveMessageList",
+			}
+		}
+		admin.messaging().sendToDevice(token, payload);
+
+		res.send("Success");
+	}
+	catch (error) {
+		res.status(400).send("Failure");
+	}
+});
 
 
 /****************************************************************
  *																*
  *																*
- *    Functions which are called on behalf of the android app   *
+ *    		Functions which are sent to the Client				*
  *																*
  *																*
  ***************************************************************/
@@ -75,57 +108,69 @@ exports.askForBulkMessages = functions.https.onRequest((req, res) => {
 	 *																*
 	 ***************************************************************/
 
-exports.newMessages = functions.https.onRequest((req, res) => {
-	let token = req.body.Token;
-	let messages = req.body.Message;
-
-	let payload = {
-		data : {
-			type: "SMS",
-			message: message
-		}
-	}
-
-	admin.messaging().sendToDevice(token, payload);
-	res.send("Success"); 
-});
-
-
-
-exports.bulkMessages = functions.https.onRequest((req, res) => {
-	let token = req.body.Token;
-
-	// This list should be a list of message objects which have the message body + a list of recipients
-	let msgList = req.body.Messages;
-
-	let payload = {
-		data: {
-			notification: "bulkMessages",
-			messages: msgList
-		}
-	}
-	
-	admin.messaging().sendToDevice(token, payload);
-	res.send("Success"); 
-});
-
-
 	/****************************************************************
 	 *																*
 	 *					Notification Messages						*	
 	 *																*
 	 ***************************************************************/
 
-exports.sendNewSMSMessageResult = functions.https.onRequest((req, res) => {
-	let token = req.body.token;
-	let msgStatus = req.body.msgStatus;
+// Notify the client that the conversation list is available on the server to retrieve
+exports.ConversationList = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
 
-	let payload = {
-		notification: {
-			title: "sendNewSMSMessageResult",
-			body: msgStatus
+		let payload = {
+			data: {
+				"NotificationType": "ConversationList"
+			}
 		}
+		admin.messaging().sendToDevice(token, payload);
+		res.send("Success");
 	}
+	catch(error){
+		res.status(400).send("Failure");
+	}
+});
 
+// Notify the client that a MessageList for a particular conversation ID is available on the server to retrieve
+exports.MessageList = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
+		let conversationID = req.body.ConversationID;
+
+		let payload = {
+			data: {
+				"NotificationType": "MessageList",
+				"ConversationID": conversationID
+			}
+		}
+		admin.messaging().sendToDevice(token, payload);
+		res.send("Success");
+	}
+	catch (error) {
+		res.status(400).send("Failure");
+	}
+});
+
+exports.SentMessageStatus = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
+		let messageID = req.body.MessageID;	
+		let messageStatus = req.body.MessageStatus;	
+
+		let payload = {
+			data: {
+				"NotificationType": "SentMessageStatus",
+				"MessageID": messageID,
+				"MessageStatus": messageStatus
+			}
+		}
+
+		admin.messaging().sendToDevice(token, payload);
+		res.send("Success");
+	}
+	catch(error) {
+		res.status(400).send("Failure");
+	}
 });
 

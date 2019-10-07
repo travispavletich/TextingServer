@@ -40,6 +40,7 @@ namespace WebServer
 
             //services.AddSingleton<IConfiguration>(builder.Build());
             services.AddSingleton<ITokens, Tokens>();
+            services.AddSingleton<MessageData>();
             
              
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);

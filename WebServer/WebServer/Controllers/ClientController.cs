@@ -4,6 +4,7 @@ using RestSharp;
 using WebServer.Models;
 using System.Collections.Generic;
 using System.Net;
+using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
@@ -163,36 +164,60 @@ namespace WebServer.Controllers
                 return BadRequest(result);
             }
         }
-        
-        /*
+
+        /// <summary>
+        /// Get endpoint for the client to retrieve the list of conversations
+        /// </summary>
+        /// <param name="messageData"></param>
+        /// <returns></returns>
         [HttpGet]
-        [Route("Client/RequestBulkMessages")]
-        public ActionResult<RequestResult> RequestBulkMessages([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config)
+        [Route("Client/ConversationList")]
+        public ActionResult<RequestResult> ConversationList([FromServices] MessageData messageData)
         {
             var result = new RequestResult();
-            
-            const string firebaseFuncName = "askForBulkMessages";
-            var client = new RestClient(config["FirebaseLink"]);
-            var androidToken = tokens.AndroidToken;
-            var req = new RestRequest(firebaseFuncName, Method.GET);
 
-            var response = client.Execute(req);
-            
-            if (response.ResponseStatus == ResponseStatus.Completed)
+            if (messageData.Conversations != null)
             {
-                result.ResultMessage = "Successfully sent bulkMessageRequest to firebase";
+                result.ResultMessage = "Successfully conversations messages from server";
                 result.Status = ResultStatus.Success;
+                result.Data["Conversations"] = messageData.Conversations;
                 return Ok(result);
             }
             else
             {
-                result.ErrorMessage = response.ErrorMessage;
+                result.ErrorMessage = "Conversations list is null on server";
                 result.Status = ResultStatus.Failure;
                 return BadRequest(result);
             }
-        } 
-        */
+        }
+
+        /// <summary>
+        /// Get endpoint for the client to retrieve a list of messages, given the conversation ID
+        /// </summary>
+        /// <param name="messageData"></param>
+        /// <param name="conversationID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Client/MessageList")]
+        public ActionResult<RequestResult> MessageList([FromServices] MessageData messageData, int conversationID)
+        {
+            var result = new RequestResult();
+            
+            if (messageData.ConversationToMessages != null && messageData.ConversationToMessages.TryGetValue(conversationID, out var messageList))
+            {
+                result.ResultMessage = "Successfully retrieved messages from server";
+                result.Status = ResultStatus.Success;
+                result.Data["Messages"] = messageList;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = "There is no list of messages corresponding to that conversation ID. " +
+                                      "Perhaps try and request those messages from the app first";
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
+        }
     }
     
     

@@ -89,6 +89,14 @@ namespace WebServer.Controllers
             } 
         }
 
+        /// <summary>
+        /// Endpoint for the android app to hit to send a list of messages to the server
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <param name="config"></param>
+        /// <param name="data"></param>
+        /// <param name="messages"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("Android/MessageList")]
         public ActionResult<RequestResult> MessageList([FromServices] ITokens tokens, [FromServices] IConfiguration config, 

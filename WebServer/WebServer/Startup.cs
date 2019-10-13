@@ -41,14 +41,12 @@ namespace WebServer
             //services.AddSingleton<IConfiguration>(builder.Build());
             services.AddSingleton<ITokens, Tokens>();
             services.AddSingleton<MessageData>();
-            
-             
+
+
+            services.AddCors();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
-            services.AddCors(c =>
-            {
-                c.AddPolicy("AllowOrigin", options=>options.AllowAnyOrigin());
-            });
+            
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -64,6 +62,10 @@ namespace WebServer
                 app.UseHsts();
             }
 
+            app.UseCors(
+                options => options.WithOrigins("*").AllowAnyMethod()
+            );
+            
             app.UseHttpsRedirection();
             app.UseMvc();
         }

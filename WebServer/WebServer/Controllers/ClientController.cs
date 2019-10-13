@@ -24,7 +24,7 @@ namespace WebServer.Controllers
         /// <param name="token"></param>
         /// <returns></returns>
         [HttpGet]
-        [DisableCors]
+        [EnableCors]
         [Route("Client/Token")]
         public ActionResult<RequestResult> Token([FromServices]ITokens tokens, string token)
         {

@@ -63,7 +63,8 @@ namespace WebServer
             }
 
             app.UseCors(
-                options => options.WithOrigins("*").AllowAnyMethod()
+                options => options.WithOrigins("*").AllowAnyMethod().WithHeaders("*")
+                
             );
             
             app.UseHttpsRedirection();

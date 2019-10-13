@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Net;
+using Microsoft.AspNetCore.Cors;
 using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -21,6 +22,7 @@ namespace WebServer.Controllers
         /// <param name="config"></param>
         /// <returns></returns>
         [HttpGet]
+        [DisableCors]
         [Route("Android/token")]
         public ActionResult<RequestResult> Token(string token, [FromServices] ITokens tokens, [FromServices] IConfiguration config)
         {
@@ -57,6 +59,7 @@ namespace WebServer.Controllers
         /// <param name="conversations"></param>
         /// <returns></returns>
         [HttpPost]
+        [DisableCors]
         [Route("Android/ConversationList")]
         public ActionResult<RequestResult> ConversationList([FromServices] ITokens tokens, [FromServices] IConfiguration config, 
             [FromServices] MessageData data, [FromBody] ConversationList conversations)
@@ -98,6 +101,7 @@ namespace WebServer.Controllers
         /// <param name="messages"></param>
         /// <returns></returns>
         [HttpPost]
+        [DisableCors]
         [Route("Android/MessageList")]
         public ActionResult<RequestResult> MessageList([FromServices] ITokens tokens, [FromServices] IConfiguration config, 
                [FromServices] MessageData data, [FromBody] MessageListRequest messages)
@@ -147,6 +151,7 @@ namespace WebServer.Controllers
         /// <param name="messageStatus"></param>
         /// <returns></returns>
         [HttpPost]
+        [DisableCors]
         [Route("Android/SentMessageStatus")]
         public ActionResult<RequestResult> SentMessageStatus([FromServices] ITokens tokens,
             [FromServices] IConfiguration config, MessageStatus messageStatus)

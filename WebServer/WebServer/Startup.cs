@@ -44,6 +44,11 @@ namespace WebServer
             
              
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options=>options.AllowAnyOrigin());
+            });
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)

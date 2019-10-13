@@ -59,7 +59,6 @@ namespace WebServer.Controllers
         /// <param name="messageSendRequest"></param>
         /// <returns></returns>
         [HttpPost]
-        [DisableCors]
         [Route("Client/SendMessage")]
         public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, MessageSendRequest messageSendRequest)
         {
@@ -113,7 +112,6 @@ namespace WebServer.Controllers
         /// <param name="config"></param>
         /// <returns></returns>
         [HttpGet]
-        [DisableCors]
         [Route("Client/RetrieveConversations")]
         public ActionResult<RequestResult> RetrieveConversations([FromServices] ITokens tokens,
             [FromServices] IConfiguration config)
@@ -142,7 +140,6 @@ namespace WebServer.Controllers
         }
         
         [HttpGet]
-        [DisableCors]
         [Route("Client/RetrieveMessageList")]
         public ActionResult<RequestResult> RetrieveMessageList([FromServices] ITokens tokens,
             [FromServices] IConfiguration config, int conversationID)
@@ -176,7 +173,6 @@ namespace WebServer.Controllers
         /// <param name="messageData"></param>
         /// <returns></returns>
         [HttpGet]
-        [DisableCors]
         [Route("Client/ConversationList")]
         public ActionResult<RequestResult> ConversationList([FromServices] MessageData messageData)
         {
@@ -204,7 +200,6 @@ namespace WebServer.Controllers
         /// <param name="conversationID"></param>
         /// <returns></returns>
         [HttpGet]
-        [DisableCors]
         [Route("Client/MessageList")]
         public ActionResult<RequestResult> MessageList([FromServices] MessageData messageData, int conversationID)
         {

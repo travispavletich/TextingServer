@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 namespace WebServer.Models
 {
@@ -14,7 +15,13 @@ namespace WebServer.Models
         /// <summary>
         /// List of recipients (often will just have one entry)
         /// </summary>
-        public List<string> RecipientPhoneNumbers { get; set; }
+        public List<string> Recipients { get; set; }
+        
+        /// <summary>
+        /// Message unique ID for client use
+        /// </summary>
+        public Guid MessageID { get; set; }
+        
         
     }
 }

@@ -114,10 +114,60 @@ namespace WebServer.Controllers
         [HttpGet]
         [Route("Client/RetrieveConversations")]
         public ActionResult<RequestResult> RetrieveConversations([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config)
+            [FromServices] IConfiguration config, [FromServices] MessageData messageData)
         {
             var result = new RequestResult();
-        
+            
+            // Added stuff
+            var dict2 = new Dictionary<string, object>()
+            {
+                {"Token", tokens.ClientToken}
+            };
+            var response2 = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "ConversationList", dict2);
+            var conv1 = new Conversation {Participants = new List<string> {"1234567890", "0987654321"}, ConversationID = 1, MostRecent = "Most recent msg"};
+            var conv2 = new Conversation {Participants = new List<string> {"1234567890", "1231231231"}, ConversationID = 2, MostRecent = "Also most recent msg"};
+            var convList = new List<Conversation> {conv1, conv2};
+            var ml1 = new List<Message>
+            {
+                new Message()
+                {
+                    ConversationID = 1, Sender = "1234567890", IsSender = true, MessageBody = "First Message",
+                    TimeStamp = DateTime.Parse("1/1/2019")
+                },
+                new Message()
+                {
+                    ConversationID = 1, Sender = "0987654321", IsSender = false, MessageBody = "Second Message",
+                    TimeStamp = DateTime.Parse("1/2/2019")
+                },
+                new Message()
+                {
+                    ConversationID = 1, Sender = "1234567890", IsSender = true, MessageBody = "Most recent msg",
+                    TimeStamp = DateTime.Parse("1/3/2019")
+                }
+            };
+            
+            var ml2 = new List<Message>
+            {
+                new Message()
+                {
+                    ConversationID = 2, Sender = "1234567890", IsSender = true, MessageBody = "Test Message1",
+                    TimeStamp = DateTime.Parse("5/1/2019")
+                },
+                new Message()
+                {
+                    ConversationID = 2, Sender = "1231231231", IsSender = false, MessageBody = "Test Message2",
+                    TimeStamp = DateTime.Parse("5/2/2019")
+                },
+                new Message()
+                {
+                    ConversationID = 2, Sender = "1234567890", IsSender = true, MessageBody = "Also most recent msg",
+                    TimeStamp = DateTime.Parse("5/3/2019")
+                }
+            };
+            messageData.Conversations = convList;
+            messageData.ConversationToMessages.Add(1, ml1);
+            messageData.ConversationToMessages.Add(2, ml2);
+            
             
             var dict = new Dictionary<string, object>()
             {

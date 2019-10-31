@@ -9,5 +9,6 @@ namespace WebServer.Models
         public string MostRecent { get; set; }
         
         public List<string> Participants { get;set; }
+        
     }
 }

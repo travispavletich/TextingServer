@@ -174,3 +174,25 @@ exports.SentMessageStatus = functions.https.onRequest((req, res) => {
 	}
 });
 
+exports.newMessageReceived = functions.https.onRequest((req, res) => {
+	try {
+		let token = req.body.Token;
+		let message = req.body.Message;
+		let conversationID = req.body.ConversationID;
+		
+		let payload = {
+			data: {
+				"NotificationType": "NewMessageReceived",
+				"Message": message,
+				"ConversationID": conversationID
+			}
+		}
+		
+		admin.messaging().sendToDevice(token, payload);
+		res.send("Success");
+	}
+	catch (error) {
+		res.status(400).send("Failure");
+	}
+});
+

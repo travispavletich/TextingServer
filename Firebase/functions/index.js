@@ -178,13 +178,11 @@ exports.newMessageReceived = functions.https.onRequest((req, res) => {
 	try {
 		let token = req.body.Token;
 		let message = req.body.Message;
-		let conversationID = req.body.ConversationID;
 		
 		let payload = {
 			data: {
 				"NotificationType": "NewMessageReceived",
 				"Message": message,
-				"ConversationID": conversationID
 			}
 		}
 		

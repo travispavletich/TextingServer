@@ -130,8 +130,6 @@ namespace WebServer.Controllers
                 return BadRequest(result);
             }
         }
-        
-        
 
         /******************************************************************
          *                                                                *

@@ -40,6 +40,9 @@ def send_bulk_msgs(messageText, recipients, timestamps):
 #    send_message([6108830941], msg)
 
 
-send_bulk_msgs(['msg1', 'msg2', 'msg3'], ['6108830941', '6103060986', '6104169435'], 
-        [datetime(2018,1,1).isoformat(), datetime(2018,7,7).isoformat(), datetime(2019,2,2).isoformat()])
+#send_bulk_msgs(['msg1', 'msg2', 'msg3'], ['6108830941', '6103060986', '6104169435'], 
+#        [datetime(2018,1,1).isoformat(), datetime(2018,7,7).isoformat(), datetime(2019,2,2).isoformat()])
 
+req_url = 'http://localhost:5000/Client/RetrieveMessageList?conversationID=1'
+response = requests.get(req_url)
+print (response)

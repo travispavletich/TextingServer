@@ -149,7 +149,7 @@ namespace WebServer.Controllers
             var dict = new Dictionary<string, object>()
             {
                 {"Token", tokens.AndroidToken},
-                {"ConversationID", conversationID}
+                {"ConversationID", Convert.ToString(conversationID)}
             };
 
             var response = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveMessageList", dict);

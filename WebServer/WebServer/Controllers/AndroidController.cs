@@ -130,8 +130,6 @@ namespace WebServer.Controllers
                 return BadRequest(result);
             }
         }
-        
-        
 
         /******************************************************************
          *                                                                *
@@ -156,12 +154,12 @@ namespace WebServer.Controllers
 
             const string firebaseFuncName = "SentMessageStatus";
             var client = new RestClient(config["FirebaseLink"]);
-            var androidToken = tokens.AndroidToken;
+            var clientToken = tokens.ClientToken;
             var req = new RestRequest(firebaseFuncName, Method.POST);
 
             var dict = new Dictionary<string, object>
             {
-                {"Token", androidToken},
+                {"Token", clientToken},
                 {"MessageID", messageStatus.MessageID},
                 {"MessageStatus", messageStatus.Status}
             };
@@ -181,6 +179,49 @@ namespace WebServer.Controllers
                 result.Status = ResultStatus.Failure;
                 return BadRequest(result);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tokens"></param>
+        /// <param name="config"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Android/NewMessageReceived")]
+        public ActionResult<RequestResult> NewMessageReceived([FromServices] ITokens tokens,
+            [FromServices] IConfiguration config, Message message)
+        {
+            var result = new RequestResult();
+            const string firebaseFuncName = "newMessageReceived";
+            
+            var client = new RestClient(config["FirebaseLink"]);
+            var clientToken = tokens.ClientToken;
+            var req = new RestRequest(firebaseFuncName, Method.POST);
+
+            var dict = new Dictionary<string, object>
+            {
+                {"Token", clientToken},
+                {"Message", JsonConvert.SerializeObject(message)},
+            };
+            
+            req.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(dict), ParameterType.RequestBody);
+            var response = client.Execute(req);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                result.ResultMessage = "Successfully notified client of new message";
+                result.Status = ResultStatus.Success;
+                return Ok(result);
+            }
+            else
+            {
+                result.ErrorMessage = response.ErrorMessage;
+                result.Status = ResultStatus.Failure;
+                return BadRequest(result);
+            }
+            
         }
     }
 }

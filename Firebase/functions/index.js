@@ -59,7 +59,7 @@ exports.RetrieveConversations = functions.https.onRequest((req, res) => {
 
 		let payload = {
 			data: {
-				NotificationType: "RetrieveConversations"
+				"NotificationType": "RetrieveConversations"
 			}
 		}
 
@@ -77,10 +77,12 @@ exports.RetrieveConversations = functions.https.onRequest((req, res) => {
 exports.RetrieveMessageList = functions.https.onRequest((req, res) => {
 	try {
 		let token = req.body.Token;
+		let conversationID = req.body.ConversationID;
 
 		let payload = {
 			data: {
-				NotificationType: "RetrieveMessageList",
+				"NotificationType": "RetrieveMessageList",
+				"ConversationID": conversationID
 			}
 		}
 		admin.messaging().sendToDevice(token, payload);

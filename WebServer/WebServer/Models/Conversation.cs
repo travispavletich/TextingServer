@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace WebServer.Models
@@ -7,6 +8,8 @@ namespace WebServer.Models
         public int ConversationID { get; set; }
         
         public string MostRecent { get; set; }
+        
+        public DateTime MostRecentTimestamp { get; set; }
         
         public List<string> Participants { get;set; }
     }

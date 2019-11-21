@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Cors;
 using RestSharp;
@@ -119,7 +120,7 @@ namespace WebServer.Controllers
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                result.ResultMessage = "Successfully sent Bulk Messages to firebase";
+                result.ResultMessage = "Successfully notified client of message list availability";
                 result.Status = ResultStatus.Success;
                 return Ok(result);
             }
@@ -186,13 +187,49 @@ namespace WebServer.Controllers
         /// </summary>
         /// <param name="tokens"></param>
         /// <param name="config"></param>
+        /// <param name="messageData"></param>
         /// <param name="message"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("Android/NewMessageReceived")]
         public ActionResult<RequestResult> NewMessageReceived([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config, Message message)
+            [FromServices] IConfiguration config, [FromServices] MessageData messageData, Message message)
         {
+
+            // Update the ConversationList information when a new message is received
+            var wasConversationFound = false;
+            foreach (var c in messageData.Conversations.Where(c => c.ConversationID == message.ConversationID))
+            {
+                c.MostRecent = message.MessageBody;
+                c.MostRecentTimestamp = message.TimeStamp;
+                wasConversationFound = true;
+            }
+
+            if (!wasConversationFound)
+            {
+                messageData.Conversations.Add(new Conversation()
+                {
+                    ConversationID = message.ConversationID,
+                    MostRecent = message.MessageBody,
+                    MostRecentTimestamp = message.TimeStamp,
+                    // Consider refactoring this because really this /could/ be different
+                    Participants = new List<string>{ message.Sender } 
+                });               
+            }
+            
+            // Update the MessageList information when a new message is received
+            if (messageData.ConversationToMessages.TryGetValue(message.ConversationID, out var messageList))
+            {
+                messageList.Add(message);
+            }
+            else
+            {
+                messageData.ConversationToMessages.Add(message.ConversationID, new List<Message>
+                {
+                    message
+                });
+            }
+            
             var result = new RequestResult();
             const string firebaseFuncName = "newMessageReceived";
             

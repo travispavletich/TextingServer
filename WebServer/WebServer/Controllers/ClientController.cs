@@ -142,10 +142,34 @@ namespace WebServer.Controllers
         [HttpGet]
         [Route("Client/RetrieveMessageList")]
         public ActionResult<RequestResult> RetrieveMessageList([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config, int conversationID)
+            [FromServices] IConfiguration config, [FromServices] MessageData messageData, int conversationID)
         {
             var result = new RequestResult();
-            
+
+            if (messageData.ConversationToMessages.ContainsKey(conversationID))
+            {
+                var clientDict = new Dictionary<string, object>
+                {
+                    {"Token", tokens.ClientToken},
+                    {"ConversationID", Convert.ToString(conversationID)}
+                };
+                var clientResponse =
+                    Utilities.FirebaseUtilities.Notify(config, tokens.ClientToken, "MessageList", clientDict);
+                
+                if (clientResponse.StatusCode == HttpStatusCode.OK)
+                {
+                    result.ResultMessage = "Successfully notified client of message list availability";
+                    result.Status = ResultStatus.Success;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.ErrorMessage = clientResponse.ErrorMessage;
+                    result.Status = ResultStatus.Failure;
+                    return BadRequest(result);
+                }
+            }
+
             var dict = new Dictionary<string, object>()
             {
                 {"Token", tokens.AndroidToken},

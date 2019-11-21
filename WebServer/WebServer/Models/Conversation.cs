@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace WebServer.Models
 {
-    public class Conversation
+    public class Conversation : IComparable<Conversation>
     {
         public int ConversationID { get; set; }
         
@@ -12,5 +12,10 @@ namespace WebServer.Models
         public DateTime MostRecentTimestamp { get; set; }
         
         public List<string> Participants { get;set; }
+
+        public int CompareTo(Conversation other)
+        {
+            return MostRecentTimestamp.CompareTo(other.MostRecentTimestamp);
+        }
     }
 }

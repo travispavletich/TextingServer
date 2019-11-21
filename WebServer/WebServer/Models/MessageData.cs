@@ -13,5 +13,11 @@ namespace WebServer.Models
             Conversations = new List<Conversation>();
             ConversationToMessages = new Dictionary<int, List<Message>>();
         }
+
+        public void SortConversations()
+        {
+            Conversations.Sort();
+        }
     }
+    
 }

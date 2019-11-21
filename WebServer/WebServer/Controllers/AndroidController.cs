@@ -67,7 +67,7 @@ namespace WebServer.Controllers
             
             // Update state 
             data.Conversations = conversations.Conversations;
-            
+            data.SortConversations();
             // Notify the client that the data has been updated and is ready to retrieve
             
             var dict = new Dictionary<string, object>()
@@ -204,6 +204,7 @@ namespace WebServer.Controllers
                 c.MostRecentTimestamp = message.TimeStamp;
                 wasConversationFound = true;
             }
+            messageData.SortConversations();
 
             if (!wasConversationFound)
             {

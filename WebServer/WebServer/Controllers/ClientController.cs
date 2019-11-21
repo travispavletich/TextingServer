@@ -117,7 +117,6 @@ namespace WebServer.Controllers
             [FromServices] IConfiguration config)
         {
             var result = new RequestResult();
-        
             
             var dict = new Dictionary<string, object>()
             {
@@ -169,25 +168,28 @@ namespace WebServer.Controllers
                     return BadRequest(result);
                 }
             }
-
-            var dict = new Dictionary<string, object>()
-            {
-                {"Token", tokens.AndroidToken},
-                {"ConversationID", Convert.ToString(conversationID)}
-            };
-
-            var response = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveMessageList", dict);
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                result.ResultMessage = "Successfully sent retrieveConversations request to firebase";
-                result.Status = ResultStatus.Success;
-                return Ok(result);
-            }
             else
             {
-                result.ErrorMessage = response.ErrorMessage;
-                result.Status = ResultStatus.Failure;
-                return BadRequest(result);
+                var dict = new Dictionary<string, object>()
+                {
+                    {"Token", tokens.AndroidToken},
+                    {"ConversationID", Convert.ToString(conversationID)}
+                };
+
+                var response =
+                    Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveMessageList", dict);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    result.ResultMessage = "Successfully sent retrieveConversations request to firebase";
+                    result.Status = ResultStatus.Success;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.ErrorMessage = response.ErrorMessage;
+                    result.Status = ResultStatus.Failure;
+                    return BadRequest(result);
+                }
             }
         }
 

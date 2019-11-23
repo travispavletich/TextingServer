@@ -165,8 +165,10 @@ namespace WebServer.Controllers
                 }
             };
             messageData.Conversations = convList;
-            messageData.ConversationToMessages.Add(1, ml1);
-            messageData.ConversationToMessages.Add(2, ml2);
+            if (!messageData.ConversationToMessages.ContainsKey(1))
+                messageData.ConversationToMessages.Add(1, ml1);
+            if (!messageData.ConversationToMessages.ContainsKey(2))
+                messageData.ConversationToMessages.Add(2, ml2);
 
             return Ok();
             // End added stuff

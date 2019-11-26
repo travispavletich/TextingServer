@@ -145,7 +145,7 @@ namespace WebServer.Controllers
         {
             var result = new RequestResult();
 
-            if (messageData.ConversationToMessages.ContainsKey(conversationID))
+            if (messageData.ConversationToMessages.ContainsKey(conversationID) && messageData.ConversationToMessages[conversationID] != null)
             {
                 var clientDict = new Dictionary<string, object>
                 {

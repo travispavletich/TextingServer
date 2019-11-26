@@ -105,7 +105,11 @@ namespace WebServer.Controllers
                [FromServices] MessageData data, [FromBody] MessageListRequest messages)
         {
             var result = new RequestResult();
-                        
+
+            foreach (var message in messages.Messages)
+            {
+                message.sentSuccessfully = true;
+            }
             // Update state 
             data.ConversationToMessages[messages.ConversationID] = messages.Messages;
             

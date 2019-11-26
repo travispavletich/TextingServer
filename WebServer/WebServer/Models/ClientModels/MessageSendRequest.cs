@@ -22,6 +22,11 @@ namespace WebServer.Models
         /// </summary>
         public Guid MessageID { get; set; }
         
+        /// <summary>
+        /// Conversation ID
+        /// </summary>
+        public int ConversationID { get; set; }
+        
         
     }
 }

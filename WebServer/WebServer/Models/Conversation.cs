@@ -17,7 +17,7 @@ namespace WebServer.Models
 
         public int CompareTo(Conversation other)
         {
-            return MostRecentTimestamp.CompareTo(other.MostRecentTimestamp);
+            return other.MostRecentTimestamp.CompareTo(this.MostRecentTimestamp);
         }
     }
 }

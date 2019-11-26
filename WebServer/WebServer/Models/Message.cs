@@ -10,5 +10,7 @@ namespace WebServer.Models
         public int ConversationID { get; set; }
         public DateTime TimeStamp { get; set; }
         
+        public bool sentSuccessfully { get; set; }
+        
     }
 }

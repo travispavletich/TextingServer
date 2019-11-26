@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RestSharp;
 using WebServer.Models;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.EntityFrameworkCore.Query.ExpressionVisitors.Internal;
@@ -56,11 +57,12 @@ namespace WebServer.Controllers
         /// </summary>
         /// <param name="tokens"></param>
         /// <param name="config"></param>
+        /// <param name="messageData"></param>
         /// <param name="messageSendRequest"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("Client/SendMessage")]
-        public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, MessageSendRequest messageSendRequest)
+        public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, [FromServices] MessageData messageData, [FromBody]MessageSendRequest messageSendRequest)
         {
             var result = new RequestResult();
             
@@ -72,6 +74,29 @@ namespace WebServer.Controllers
             var message = messageSendRequest.Message;
             var recipients = messageSendRequest.Recipients;
             var messageID = messageSendRequest.MessageID;
+
+
+            foreach (var conversation in messageData.Conversations.Where(conversation => conversation.ConversationID == messageSendRequest.ConversationID))
+            {
+                conversation.MostRecent = message;
+            }
+
+            Message newMsg = new Message();
+            newMsg.ConversationID = messageSendRequest.ConversationID;
+            newMsg.sentSuccessfully = false;
+            newMsg.Sender = "";
+            newMsg.IsSender = true;
+            newMsg.TimeStamp = DateTime.Now;
+            newMsg.MessageBody = message;
+            if (messageData.ConversationToMessages.TryGetValue(messageSendRequest.ConversationID,  out var msgList))
+            {
+                messageData.ConversationToMessages[messageSendRequest.ConversationID].Insert(0, newMsg);
+            }
+            else
+            {
+                messageData.ConversationToMessages[messageSendRequest.ConversationID] = new List<Message>();
+                messageData.ConversationToMessages[messageSendRequest.ConversationID].Insert(0, newMsg);
+            }
             
             var dict = new Dictionary<string, object>()
             {

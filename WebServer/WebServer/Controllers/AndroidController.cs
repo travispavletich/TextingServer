@@ -149,7 +149,7 @@ namespace WebServer.Controllers
         [HttpPost]
         [Route("Android/SentMessageStatus")]
         public ActionResult<RequestResult> SentMessageStatus([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config, MessageStatus messageStatus)
+            [FromServices] IConfiguration config, [FromBody] MessageStatus messageStatus)
         {
             var result = new RequestResult();
 
@@ -193,9 +193,8 @@ namespace WebServer.Controllers
         [HttpPost]
         [Route("Android/NewMessageReceived")]
         public ActionResult<RequestResult> NewMessageReceived([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config, [FromServices] MessageData messageData, Message message)
+            [FromServices] IConfiguration config, [FromServices] MessageData messageData, [FromBody] Message message)
         {
-
             // Update the ConversationList information when a new message is received
             var wasConversationFound = false;
             foreach (var c in messageData.Conversations.Where(c => c.ConversationID == message.ConversationID))

@@ -12,6 +12,8 @@ namespace WebServer.Models
         public DateTime MostRecentTimestamp { get; set; }
         
         public List<string> Participants { get;set; }
+        
+        public List<string> Contacts { get; set; }
 
         public int CompareTo(Conversation other)
         {

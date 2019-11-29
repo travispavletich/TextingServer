@@ -62,7 +62,7 @@ namespace WebServer.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("Client/SendMessage")]
-        public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, [FromServices] MessageData messageData, [FromBody]MessageSendRequest messageSendRequest)
+        public ActionResult<RequestResult> SendMessage([FromServices]ITokens tokens, [FromServices] IConfiguration config, [FromServices] MessageData messageData, MessageSendRequest messageSendRequest)
         {
             var result = new RequestResult();
             

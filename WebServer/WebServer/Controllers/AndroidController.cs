@@ -33,6 +33,15 @@ namespace WebServer.Controllers
                 tokens.AndroidToken = token;
                 result.Status = ResultStatus.Success;
                 result.ResultMessage = "Token Received Successfully";
+                
+                
+                var dict = new Dictionary<string, object>()
+                {
+                    {"Token", tokens.AndroidToken}
+                };
+                
+                var response = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveConversations", dict);
+                
                 return Ok(result);
             }
             else

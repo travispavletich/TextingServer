@@ -25,7 +25,6 @@ namespace WebServer.Controllers
         /// <param name="token"></param>
         /// <returns></returns>
         [HttpGet]
-        [EnableCors]
         [Route("Client/Token")]
         public ActionResult<RequestResult> Token([FromServices]ITokens tokens, string token)
         {
@@ -231,7 +230,7 @@ namespace WebServer.Controllers
 
             if (messageData.Conversations != null)
             {
-                result.ResultMessage = "Successfully conversations messages from server";
+                result.ResultMessage = "Successfully conversationLists from server";
                 result.Status = ResultStatus.Success;
                 result.Data["Conversations"] = messageData.Conversations;
                 return Ok(result);

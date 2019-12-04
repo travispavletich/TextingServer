@@ -153,7 +153,7 @@ namespace WebServer.Controllers
         [HttpPost]
         [Route("Android/SentMessageStatus")]
         public ActionResult<RequestResult> SentMessageStatus([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config, [FromBody] MessageStatus messageStatus)
+            [FromServices] IConfiguration config, [FromServices] MessageData messageData, [FromBody] MessageStatus messageStatus)
         {
             var result = new RequestResult();
 
@@ -168,6 +168,13 @@ namespace WebServer.Controllers
                 {"MessageID", messageStatus.MessageID},
                 {"MessageStatus", messageStatus.Status}
             };
+
+            // GUID stuff
+            if (messageData.UnsentMessageGuids.ContainsKey(messageStatus.MessageID))
+            {
+                messageData.UnsentMessageGuids[messageStatus.MessageID].sentSuccessfully = true;
+                messageData.UnsentMessageGuids.Remove(messageStatus.MessageID);
+            }
             
             req.AddParameter("application/json; charset=utf-8", JsonConvert.SerializeObject(dict), ParameterType.RequestBody);
             var response = client.Execute(req);

@@ -87,14 +87,18 @@ namespace WebServer.Controllers
             newMsg.IsSender = true;
             newMsg.TimeStamp = DateTime.Now;
             newMsg.MessageBody = message;
+            
+            // GUID stuff
+            messageData.UnsentMessageGuids[messageID] = newMsg;
+
             if (messageData.ConversationToMessages.TryGetValue(messageSendRequest.ConversationID,  out var msgList))
             {
-                messageData.ConversationToMessages[messageSendRequest.ConversationID].Insert(0, newMsg);
+                messageData.ConversationToMessages[messageSendRequest.ConversationID].Add(newMsg);
             }
             else
             {
                 messageData.ConversationToMessages[messageSendRequest.ConversationID] = new List<Message>();
-                messageData.ConversationToMessages[messageSendRequest.ConversationID].Insert(0, newMsg);
+                messageData.ConversationToMessages[messageSendRequest.ConversationID].Add(newMsg);
             }
             
             var dict = new Dictionary<string, object>()

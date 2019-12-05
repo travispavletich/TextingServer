@@ -2,7 +2,7 @@ using System;
 
 namespace WebServer.Models
 {
-    public class Message
+    public class Message : IComparable<Message>
     {
         public string Sender { get; set; }
         public bool IsSender { get; set; }
@@ -12,5 +12,9 @@ namespace WebServer.Models
         
         public bool sentSuccessfully { get; set; }
         
+        public int CompareTo(Message other)
+        {
+            return this.TimeStamp.CompareTo(other.TimeStamp);
+        }
     }
 }

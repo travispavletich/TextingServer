@@ -15,6 +15,7 @@ namespace WebServer.Controllers
 {
     public class AndroidController : Controller
     {
+        private int globalCnt = 0;
         /// <summary>
         /// Gets the Token for the Android app 
         /// </summary>
@@ -27,6 +28,7 @@ namespace WebServer.Controllers
         public ActionResult<RequestResult> Token(string token, [FromServices] ITokens tokens, [FromServices] IConfiguration config)
         {
             var result = new RequestResult();
+            Console.WriteLine("TOKEN");
             
             if (!string.IsNullOrEmpty(token))
             {
@@ -72,13 +74,32 @@ namespace WebServer.Controllers
         public ActionResult<RequestResult> ConversationList([FromServices] ITokens tokens, [FromServices] IConfiguration config, 
             [FromServices] MessageData data, [FromBody] ConversationList conversations)
         {
+            
+            Console.WriteLine("CONVERSATIONLIST");
             var result = new RequestResult();
             
             // Update state 
             data.Conversations = conversations.Conversations;
             data.SortConversations();
-            // Notify the client that the data has been updated and is ready to retrieve
             
+            // Preload 5 most recent conversations
+            for (int i = 0; i < 5 && data.Conversations.Count >= i; i++)
+            {
+                Conversation curr = data.Conversations[i];
+                Console.WriteLine("********************************\t" + i + "\t" + curr.ConversationID);
+                if (!data.ConversationToMessages.ContainsKey(curr.ConversationID))
+                {
+                    var msgDict = new Dictionary<string, object>()
+                    {
+                        {"Token", tokens.AndroidToken},
+                        {"ConversationID", Convert.ToString(curr.ConversationID)}
+                    };
+                    int x = 10; 
+                    Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveMessageList", msgDict);
+                }
+            }
+
+            // Notify the client that the data has been updated and is ready to retrieve
             var dict = new Dictionary<string, object>()
             {
                 {"Token", tokens.ClientToken}
@@ -97,7 +118,7 @@ namespace WebServer.Controllers
                 result.ErrorMessage = response.ErrorMessage;
                 result.Status = ResultStatus.Failure;
                 return BadRequest(result);
-            } 
+            }
         }
 
         /// <summary>
@@ -114,13 +135,14 @@ namespace WebServer.Controllers
                [FromServices] MessageData data, [FromBody] MessageListRequest messages)
         {
             var result = new RequestResult();
-
+            Console.WriteLine("************************** MSGLIST" + messages.ConversationID);
             foreach (var message in messages.Messages)
             {
                 message.sentSuccessfully = true;
             }
             // Update state 
             data.ConversationToMessages[messages.ConversationID] = messages.Messages;
+            data.ConversationToMessages[messages.ConversationID].Sort();
             
             // Notify the client that the data has been updated and is ready to retrieve
             var dict = new Dictionary<string, object>()

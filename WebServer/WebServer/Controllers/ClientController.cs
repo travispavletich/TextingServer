@@ -142,7 +142,7 @@ namespace WebServer.Controllers
         [HttpGet]
         [Route("Client/RetrieveConversations")]
         public ActionResult<RequestResult> RetrieveConversations([FromServices] ITokens tokens,
-            [FromServices] IConfiguration config)
+            [FromServices] IConfiguration config, [FromServices] MessageData data)
         {
             var result = new RequestResult();
             
@@ -150,19 +150,31 @@ namespace WebServer.Controllers
             {
                 {"Token", tokens.AndroidToken}
             };
-            
-            var response = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveConversations", dict);
-            if (response.StatusCode == HttpStatusCode.OK)
+            if (data.Conversations == null || data.Conversations.Count == 0)
             {
-                result.ResultMessage = "Successfully sent retrieveConversations request to firebase";
-                result.Status = ResultStatus.Success;
-                return Ok(result);
+                var response = Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveConversations", dict);
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    result.ResultMessage = "Successfully sent retrieveConversations request to firebase";
+                    result.Status = ResultStatus.Success;
+                    return Ok(result);
+                }
+                else
+                {
+                    result.ErrorMessage = response.ErrorMessage;
+                    result.Status = ResultStatus.Failure;
+                    return BadRequest(result);
+                }
             }
             else
             {
-                result.ErrorMessage = response.ErrorMessage;
-                result.Status = ResultStatus.Failure;
-                return BadRequest(result);
+                var clientDict = new Dictionary<string, object>()
+                {
+                    {"Token", tokens.ClientToken}
+                };
+            
+                var response = Utilities.FirebaseUtilities.Notify(config, tokens.ClientToken, "ConversationList", clientDict);
+                return Ok(result);
             }
         }
         

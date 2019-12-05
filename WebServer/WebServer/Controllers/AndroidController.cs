@@ -86,7 +86,6 @@ namespace WebServer.Controllers
             for (int i = 0; i < 5 && data.Conversations.Count >= i; i++)
             {
                 Conversation curr = data.Conversations[i];
-                Console.WriteLine("********************************\t" + i + "\t" + curr.ConversationID);
                 if (!data.ConversationToMessages.ContainsKey(curr.ConversationID))
                 {
                     var msgDict = new Dictionary<string, object>()
@@ -134,7 +133,7 @@ namespace WebServer.Controllers
                [FromServices] MessageData data, [FromBody] MessageListRequest messages)
         {
             var result = new RequestResult();
-            Console.WriteLine("************************** MSGLIST" + messages.ConversationID);
+            Console.WriteLine($"Messages for Conversation {messages.ConversationID} have been loaded");
             foreach (var message in messages.Messages)
             {
                 message.sentSuccessfully = true;

@@ -94,7 +94,6 @@ namespace WebServer.Controllers
                         {"Token", tokens.AndroidToken},
                         {"ConversationID", Convert.ToString(curr.ConversationID)}
                     };
-                    int x = 10; 
                     Utilities.FirebaseUtilities.Notify(config, tokens.AndroidToken, "RetrieveMessageList", msgDict);
                 }
             }

@@ -11,7 +11,7 @@ namespace WebServer.Utilities
 
         public static IRestResponse Notify(IConfiguration config, string recipient, string fbFunctionName, Dictionary<string, object> dict)
         {
-            var client = new RestClient(config["FirebaseLink"]);
+            var client = new RestClient("https://us-central1-testandroidtexingapp.cloudfunctions.net");
             var androidToken = recipient;
             var req = new RestRequest(fbFunctionName, Method.POST);
 

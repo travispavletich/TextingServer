@@ -2,8 +2,8 @@
 
 The texting server is a .net core application written in C#.
 
-A finalized release version is not yet available because the application is still in development.
-### To run the application:
+
+### To run the application manually:
   - .Net Core version 2.2 must be installed
   - Either Visual Studio (Windows) or Rider (Cross platform) should be installed
   - Clone the repo
